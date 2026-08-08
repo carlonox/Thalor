@@ -86,13 +86,10 @@ cp .env.example .env
 ### 3. Start the stack
 
 ```bash
-# Start backend (implement your own — see docker-compose.yml)
-cd apps/backend
-npm install
-npm start
+# Backend is conceptual — implement your own for your specific hardware
+# See docker-compose.yml (commented) for the intended architecture
 
 # Start agent
-cd ../..
 docker compose up -d
 ```
 
