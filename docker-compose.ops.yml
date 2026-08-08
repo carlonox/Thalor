@@ -1,0 +1,42 @@
+services:
+  hermes-ops:
+    image: nousresearch/hermes-agent:latest
+    container_name: ${OPS_AGENT_NAME:-thalor-ops}
+    restart: unless-stopped
+    ports:
+      - "${OPS_API_PORT:-8642}:8642"
+      - "${OPS_DASHBOARD_PORT:-9219}:9119"
+      # 9250 is the Ops custom proxy port (runs as separate process); 9200 has no service in the hermes-agent image
+      - "${OPS_PROXY_PORT:-9250}:9250"
+    volumes:
+      - ./data-ops:/opt/data
+      - ./shared:/opt/data/shared
+      - ./shared/kanban/kanban.db:/opt/data/kanban.db
+      - ./shared/kanban/boards:/opt/data/kanban/boards
+    environment:
+      - HERMES_DASHBOARD=1
+      - HERMES_HOME=/opt/data
+      - HOME=/opt/data
+      - HERMES_WRITE_SAFE_ROOT=/opt/data
+    command: gateway run
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "bash",
+          "-c",
+          "curl -sf http://localhost:9119/ || pgrep -f 'hermes gateway' > /dev/null",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - thalor-net
+    depends_on:
+      hermes:
+        condition: service_healthy
+
+networks:
+  thalor-net:
+    driver: bridge

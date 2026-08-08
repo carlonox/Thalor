@@ -1,0 +1,14 @@
+# AgentMail MCP Server Configuration
+# Email management for agents
+
+agentmail:
+  enabled: true
+  headers:
+    x-api-key: ${AGENTMAIL_API_KEY}
+  url: https://mcp.agentmail.to/mcp
+  
+  # Setup:
+  # 1. Sign up at https://agentmail.to
+  # 2. Get your API key from dashboard
+  # 3. Add to .env:
+  #    AGENTMAIL_API_KEY=am_us_[REDACTED]

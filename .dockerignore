@@ -1,0 +1,54 @@
+# =============================================================================
+# Thalor .dockerignore
+# =============================================================================
+
+# Git
+.git
+.gitignore
+
+# Documentation
+*.md
+!README.md
+docs/
+examples/
+
+# Development
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testing
+tests/
+coverage/
+.pytest_cache/
+
+# Backups
+*.bak
+*.backup
+
+# Archives
+*.tar.gz
+*.zip
+*.rar
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Data directories
+data/
+data-ops/
+shared/
+vault/
+
+# Node modules
+node_modules/
+
+# Python cache
+__pycache__/
+*.py[cod]

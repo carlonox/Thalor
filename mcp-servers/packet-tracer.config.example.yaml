@@ -1,0 +1,13 @@
+# Packet Tracer MCP Server Configuration
+# Cisco Packet Tracer integration
+
+packet-tracer:
+  enabled: true
+  command: /opt/data/packet-tracer-mcp/run-mcp.sh
+  
+  # Setup:
+  # 1. Install Cisco Packet Tracer
+  # 2. Clone packet-tracer-mcp repository
+  # 3. Configure bridge token in .env:
+  #    PACKET_TRACER_BRIDGE_TOKEN=[REDACTED]
+  # 4. The run-mcp.sh script handles the bridge communication

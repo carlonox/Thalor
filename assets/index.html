@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thalor Agent</title>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #16161d;
+      --accent: #f59e0b;
+      --text: #e4e4e7;
+      --muted: #71717a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 1rem 2rem;
+      border-bottom: 1px solid #27272a;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .status {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: #ef4444;
+    }
+    .status.connected { background: #10b981; }
+    main {
+      flex: 1;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+      width: 100%;
+    }
+    h1 { color: var(--accent); margin-bottom: 1rem; }
+    .info { color: var(--muted); line-height: 1.6; }
+    code {
+      background: var(--surface);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    .mood { margin-top: 2rem; padding: 1rem; background: var(--surface); border-radius: 8px; }
+    .mood-label { color: var(--accent); font-weight: bold; }
+    #messages {
+      margin-top: 1rem;
+      max-height: 300px;
+      overflow-y: auto;
+      font-size: 0.9em;
+      white-space: pre-wrap;
+    }
+    #messages .msg { padding: 0.5rem; border-bottom: 1px solid #27272a; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="status" id="status"></div>
+    <span>Thalor Agent</span>
+  </header>
+  <main>
+    <h1>Thalor Agent Dashboard</h1>
+    <p class="info">
+      WebSocket relay proxy connected to Hermes gateway.<br>
+      Replace this file with your own custom UI at <code>assets/index.html</code>.<br>
+      Current mood: <span class="mood-label" id="mood">neutral</span>
+    </p>
+    <div class="mood">
+      <div class="mood-label">Live messages</div>
+      <div id="messages"><div class="msg" style="color:var(--muted)">Waiting for connection...</div></div>
+    </div>
+  </main>
+  <script>
+    const RECONNECT = { base: 500, max: 30000, maxAttempts: 15, jitter: 0.3 };
+    let attempts = 0;
+    let ws;
+
+    async function getTicket() {
+      const resp = await fetch('/api/auth/ws-ticket');
+      const data = await resp.json();
+      return data.ticket;
+    }
+
+    async function connect() {
+      try {
+        const ticket = await getTicket();
+        const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+        ws = new WebSocket(`${protocol}//${location.host}/api/ws?ticket=${ticket}`);
+
+        ws.onopen = () => {
+          document.getElementById('status').classList.add('connected');
+          attempts = 0;
+        };
+
+        ws.onmessage = (event) => {
+          try {
+            const msg = JSON.parse(event.data);
+            if (msg.content) {
+              const moodMatch = msg.content.match(/\[mood:\s*(\w+)\]/);
+              if (moodMatch) {
+                document.getElementById('mood').textContent = moodMatch[1];
+              }
+              const box = document.getElementById('messages');
+              const el = document.createElement('div');
+              el.className = 'msg';
+              el.textContent = msg.content.slice(0, 500) + (msg.content.length > 500 ? '…' : '');
+              box.prepend(el);
+            }
+          } catch (e) {}
+        };
+
+        ws.onclose = () => {
+          document.getElementById('status').classList.remove('connected');
+          scheduleReconnect();
+        };
+      } catch (e) {
+        scheduleReconnect();
+      }
+    }
+
+    function scheduleReconnect() {
+      if (attempts >= RECONNECT.maxAttempts) {
+        setTimeout(() => { attempts = 0; connect(); }, 120000);
+        return;
+      }
+      const delay = Math.min(
+        RECONNECT.base * Math.pow(2, attempts),
+        RECONNECT.max
+      );
+      const jitter = delay * RECONNECT.jitter * (Math.random() * 2 - 1);
+      setTimeout(connect, delay + jitter);
+      attempts++;
+    }
+
+    connect();
+  </script>
+</body>
+</html>

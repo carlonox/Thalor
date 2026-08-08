@@ -1,0 +1,27 @@
+# GNS3 MCP Server Configuration
+# Network simulation and testing
+
+gns3-mcp:
+  enabled: true
+  command: /path/to/gns3-mcp-venv/bin/gns3-mcp
+  args:
+    - --host
+    - ${GNS3_HOST}
+    - --port
+    - ${GNS3_PORT}
+    - --username
+    - ${GNS3_USERNAME}
+    - --password
+    - ${GNS3_PASSWORD}
+  
+  # Setup:
+  # 1. Install GNS3 server (https://www.gns3.com/)
+  # 2. Create Python virtual environment:
+  #    python3 -m venv gns3-mcp-venv
+  #    source gns3-mcp-venv/bin/activate
+  #    pip install gns3-mcp
+  # 3. Configure in .env:
+  #    GNS3_HOST=192.168.1.100  # or your GNS3 server IP
+  #    GNS3_PORT=3080
+  #    GNS3_USERNAME=admin
+  #    GNS3_PASSWORD=[REDACTED]

@@ -1,0 +1,107 @@
+# =============================================================================
+# Mnemosyne Memory Configuration Template
+# =============================================================================
+# This configures the BEAM memory architecture (working → episodic → persona)
+# Location: /opt/data/mnemosyne/config.yaml
+
+# Auto-migration
+# ---------------------------------------------------------------------------
+auto_migrate: true
+auto_sleep_enabled: true
+
+# Embedding Configuration
+# ---------------------------------------------------------------------------
+embeddings_via_api: true
+embedding_api_url: ${MNEMOSYNE_EMBEDDING_API_URL}
+embedding_api_key: ${VISION_API_KEY}
+embedding_model: ${MNEMOSYNE_EMBEDDING_MODEL}
+embedding_dim: 1024
+vec_type: int8
+
+# Host LLM (Archivist)
+# ---------------------------------------------------------------------------
+host_llm_enabled: ${MNEMOSYNE_HOST_LLM_ENABLED}
+host_llm_model: ${MNEMOSYNE_HOST_LLM_MODEL}
+host_llm_n_ctx: 2048
+
+# Sleep Prompt (Archivist Instructions)
+# ---------------------------------------------------------------------------
+sleep_prompt: |
+  You are the Archivist for this agent. Read the session context and extract
+  permanent knowledge. Work in third person, in the agent's language, no disclaimers.
+
+  STRICT RULES:
+  1) Ignore trivial conversation, greetings, session plans, mood states, debugging.
+  2) Extract ONLY technical facts (IPs, configs, architecture, paths) and confirmed user preferences.
+  3) Correct typos before saving.
+  4) If uncertain whether something is real or a test, DISCARD it.
+  5) Format: one fact per line, concise but complete.
+  6) NEVER generate text in random characters or other languages.
+
+  ANTI-GARBAGE RULES:
+  7) NEVER include <think>, "I need to", "Let me", "First", "I should" in output.
+  8) NEVER consolidate logs, errors, stack traces, raw JSON, or command output
+     unless they contain an explicit lesson learned.
+  9) NEVER consolidate pure confirmations ("ok", "done", "yes").
+     DO consolidate messages with implicit instructions or decisions.
+  10) Temporary states ("is running", "is offline"): save as working memory with
+      valid_until +24h, NEVER as permanent fact.
+  11) NEVER consolidate secrets, tokens, passwords, API keys, or credentials.
+  12) Each episodic memory = 1 topic, 1-3 sentences, no internal reasoning.
+  13) Each fact = 1 atomic proposition: complete subject (>3 chars), valid predicate,
+      complete object (>2 words). Prohibited subjects: "The user", "User", "None".
+  14) If confidence < 0.6 or veracity=unknown → DO NOT consolidate as permanent fact.
+  15) If semantically equivalent memory exists → UPDATE, don't create duplicate.
+
+# Working Memory
+# ---------------------------------------------------------------------------
+wm_max_items: 10000
+wm_ttl_hours: 48
+wm_bump_cap_hours: 24
+
+# Episodic Memory
+# ---------------------------------------------------------------------------
+ep_limit: 50000
+temporal_halflife_hours: 168
+recency_halflife: 168
+
+# Tiered Weights
+# ---------------------------------------------------------------------------
+tier1_weight: 1.0
+tier2_days: 30
+tier2_weight: 0.5
+tier3_days: 180
+tier3_weight: 0.25
+tier3_max_chars: 300
+
+# Vector Search
+# ---------------------------------------------------------------------------
+vec_weight: 0.5
+fts_weight: 0.3
+importance_weight: 0.2
+
+# Smart Compression
+# ---------------------------------------------------------------------------
+smart_compress: true
+prefetch_content_chars: 2000
+
+# Session Management
+# ---------------------------------------------------------------------------
+cross_session: false
+default_scope: session
+skip_contexts: cron,flush,subagent,background,skill_loop
+
+# Persona Sync (Optional)
+# ---------------------------------------------------------------------------
+persona_enabled: false
+persona_interval: 10
+persona_token_cap: 500
+persona_daily_sync_hour: 3
+
+# Performance
+# ---------------------------------------------------------------------------
+sleep_batch: 5000
+degrade_batch: 100
+llm_n_threads: 4
+llm_timeout: 60
+llm_max_tokens: 512

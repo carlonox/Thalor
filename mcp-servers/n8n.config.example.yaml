@@ -1,0 +1,16 @@
+# n8n MCP Server Configuration
+# Automation workflows via n8n
+
+n8n:
+  enabled: true
+  headers:
+    Authorization: Bearer ${N8N_BEARER_TOKEN}
+  url: ${N8N_URL}
+  
+  # How to get your bearer token:
+  # 1. Open n8n dashboard (http://localhost:5678)
+  # 2. Go to Settings → API
+  # 3. Create API key
+  # 4. Copy the token to your .env file:
+  #    N8N_BEARER_TOKEN=eyJhbG...VCJ9...
+  #    N8N_URL=http://host.docker.internal:5678/mcp-server/http

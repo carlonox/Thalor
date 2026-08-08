@@ -1,0 +1,68 @@
+services:
+  hermes:
+    image: nousresearch/hermes-agent:latest
+    container_name: ${AGENT_NAME:-thalor-agent}
+    restart: unless-stopped
+    ports:
+      - "${GATEWAY_PORT:-9119}:9119"
+      - "9120:9120"
+      - "9121:9121"
+    volumes:
+      - ./data:/opt/data
+      - ./vault:/mnt/vault
+      - ./shared:/opt/data/shared
+    environment:
+      - HERMES_DASHBOARD=1
+      - HERMES_HOME=/opt/data
+      - HOME=/opt/data
+      - HERMES_WRITE_SAFE_ROOT=/opt/data
+      - HERMES_DISABLE_LAZY_INSTALLS=1
+      - HERMES_LAZY_INSTALL_TARGET=/opt/data/lazy-packages
+    # Nota: la imagen registra gateways dinámicamente vía gateway_state.json — no overridear CMD
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "bash",
+          "-c",
+          "curl -sf http://localhost:9119/ || pgrep -f 'hermes gateway' > /dev/null",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - thalor-net
+
+  dashboard-proxy:
+    image: python:3.13-slim
+    restart: unless-stopped
+    ports:
+      - "${DASHBOARD_PORT:-9999}:9999"
+    volumes:
+      - ./data:/opt/data
+      - ./proxies:/opt/proxies
+      - ./assets:/opt/assets
+    environment:
+      - HERMES_HOST=hermes
+      - HERMES_PORT=${GATEWAY_PORT:-9119}
+      - DASHBOARD_PORT=9999
+      - DASHBOARD_USERNAME=${DASHBOARD_USERNAME}
+      - DASHBOARD_PASSWORD=${DASHBOARD_PASSWORD}
+      - ASSETS_DIR=/opt/assets
+    command: bash -c "pip install aiohttp pyyaml && python3 /opt/proxies/dashboard-proxy.template.py"
+    healthcheck:
+      test: ["CMD", "bash", "-c", "curl -sf http://localhost:9999/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    depends_on:
+      hermes:
+        condition: service_healthy
+    networks:
+      - thalor-net
+
+networks:
+  thalor-net:
+    driver: bridge

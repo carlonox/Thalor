@@ -1,0 +1,145 @@
+# =============================================================================
+# Thalor Agent Configuration Template
+# =============================================================================
+# This is a sanitized template. Copy to your agent's config.yaml and customize.
+# See: docs/getting-started.md for setup instructions
+
+# Model Configuration
+# ---------------------------------------------------------------------------
+model:
+  default: ${LLM_MODEL}
+  provider: ${LLM_PROVIDER}
+
+fallback_providers:
+  - model: ${FALLBACK_MODEL_1}
+    provider: ${FALLBACK_PROVIDER_1}
+  - model: ${FALLBACK_MODEL_2}
+    provider: ${FALLBACK_PROVIDER_2}
+
+# Agent Configuration
+# ---------------------------------------------------------------------------
+agent:
+  max_turns: 60
+  api_max_retries: 3
+  verify_on_stop: false
+  name: ${AGENT_NAME}
+  reasoning_effort: xhigh
+  system_prompt_file: /opt/data/SOUL.md
+
+# Terminal Configuration
+# ---------------------------------------------------------------------------
+terminal:
+  backend: local
+  cwd: .
+  timeout: 180
+  home_mode: auto
+
+# Compression Settings
+# ---------------------------------------------------------------------------
+compression:
+  enabled: true
+  threshold: 0.5
+  target_ratio: 0.2
+  protect_last_n: 20
+  protect_first_n: 3
+
+# Prompt Caching
+# ---------------------------------------------------------------------------
+prompt_caching:
+  cache_ttl: 5m
+
+# Auxiliary Models
+# ---------------------------------------------------------------------------
+auxiliary:
+  vision:
+    provider: custom
+    model: ${VISION_MODEL}
+    base_url: ${VISION_BASE_URL}
+    api_key: ${VISION_API_KEY}
+  compression:
+    provider: ${LLM_PROVIDER}
+    model: ${LLM_MODEL}
+  title:
+    model: ${LLM_MODEL}
+    provider: ${LLM_PROVIDER}
+
+# Display Settings
+# ---------------------------------------------------------------------------
+display:
+  compact: false
+  show_reasoning: false
+  streaming: true
+  tool_progress: all
+
+# Dashboard Configuration
+# ---------------------------------------------------------------------------
+dashboard:
+  basic_auth:
+    username: ${DASHBOARD_USERNAME}
+    password_hash: ${DASHBOARD_PASSWORD_HASH}
+    secret: ${DASHBOARD_SECRET}
+  host: 0.0.0.0
+  port: 9119
+
+# Memory Configuration (Mnemosyne)
+# ---------------------------------------------------------------------------
+memory:
+  memory_enabled: false  # Disable built-in memory (use Mnemosyne instead)
+  user_profile_enabled: false
+  write_approval: false
+  memory_char_limit: 50000
+  provider: ${MEMORY_PROVIDER}
+  auto_extract: false
+  flush_min_turns: 999
+
+# Approval Policy
+# ---------------------------------------------------------------------------
+approvals:
+  mode: smart
+  timeout: 120
+  smart_policy: |
+    - ESCALATE any pipe to an interpreter (curl|python3, wget|bash, curl|sh)
+    - ESCALATE python -c / bash -c payloads containing rmtree, os.remove, subprocess, eval, exec, sudo
+    - ESCALATE any write to /etc, /usr, /var, /boot or system paths
+    - ESCALATE any command containing sudo
+    - ESCALATE git push --force, filter-branch, history rewrites
+    - ESCALATE any rm -rf targeting home (~), root (/), or wildcards in critical paths
+
+command_allowlist: '["docker restart/stop/kill (container lifecycle)"]'
+
+# MCP Servers (uncomment and configure as needed)
+# ---------------------------------------------------------------------------
+# mcp_servers:
+#   n8n:
+#     enabled: true
+#     headers:
+#       Authorization: Bearer ${N8N_BEARER_TOKEN}
+#     url: ${N8N_URL}
+#   
+#   gns3-mcp:
+#     command: /path/to/gns3-mcp
+#     args:
+#       - --host
+#       - ${GNS3_HOST}
+#       - --port
+#       - ${GNS3_PORT}
+#       - --username
+#       - ${GNS3_USERNAME}
+#       - --password
+#       - ${GNS3_PASSWORD}
+#     enabled: true
+
+# Session Reset
+# ---------------------------------------------------------------------------
+session_reset:
+  at_hour: 4
+  idle_minutes: 1440
+  mode: both
+
+# File Mutation Verifier
+# ---------------------------------------------------------------------------
+file_mutation_verifier: false
+
+# Config Version
+# ---------------------------------------------------------------------------
+_config_version: 33

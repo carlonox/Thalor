@@ -1,0 +1,43 @@
+services:
+  hermes:
+    image: nousresearch/hermes-agent:latest
+    container_name: robot-agent
+    restart: unless-stopped
+    ports:
+      - "9999:9999"
+      - "9119:9119"
+    volumes:
+      - ./data:/opt/data
+      - ./apps:/opt/data/apps
+    environment:
+      - HERMES_DASHBOARD=1
+      - HERMES_HOME=/opt/data
+      - HOME=/opt/data
+      - ROBOT_URL=http://host.docker.internal:5002
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "bash",
+          "-c",
+          "curl -sf http://localhost:9999/ || pgrep -f 'hermes gateway' > /dev/null",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Backend is conceptual — implement your own for your specific hardware
+  # See README.md for architecture guidance
+  #
+  # backend:
+  #   build: ./apps/backend
+  #   container_name: robot-backend
+  #   restart: unless-stopped
+  #   ports:
+  #     - "5002:5002"
+  #   environment:
+  #     - ROBOT_IP=${ROBOT_IP}
+  #     - ROBOT_PORT=${ROBOT_PORT}
+  #   depends_on:
+  #     - hermes
