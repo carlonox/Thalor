@@ -1,0 +1,75 @@
+# =============================================================================
+# Thalor Dashboard Proxy
+# =============================================================================
+# Lightweight Docker image for the WebSocket relay proxy that sits in front of
+# the Hermes gateway. Provides:
+#   - Custom branding (HTML/CSS served from /app/assets)
+#   - Auth relay (single login to Hermes gateway)
+#   - WebSocket relay (bidirectional piping to Hermes internal WS)
+#   - Mood-based avatar switching (reads [mood: xxx] tags from agent responses)
+#   - MCP server config endpoint (/mcp-servers)
+#
+# Published as: ghcr.io/carlonox/thalor/proxy
+#
+# Usage:
+#   docker pull ghcr.io/carlonox/thalor/proxy:latest
+#   docker run -d \
+#     -e HERMES_HOST=host.docker.internal \
+#     -e HERMES_PORT=9119 \
+#     -e DASHBOARD_USERNAME=agent \
+#     -e DASHBOARD_PASSWORD=secret \
+#     -p 9999:9999 \
+#     ghcr.io/carlonox/thalor/proxy:latest
+#
+# Build locally:
+#   docker build -f Dockerfile.proxy -t thalor-proxy .
+# =============================================================================
+
+FROM python:3.13-slim AS runtime
+
+LABEL org.opencontainers.image.title="Thalor Dashboard Proxy"
+LABEL org.opencontainers.image.description="WebSocket relay proxy for Hermes Agent dashboard"
+LABEL org.opencontainers.image.source="https://github.com/carlonox/Thalor"
+LABEL org.opencontainers.image.licenses="MIT"
+LABEL org.opencontainers.image.authors="Carlos Javier Cuervo Baracaldo"
+
+# Security: non-root user
+RUN groupadd -r proxy && useradd -r -g proxy -d /app -s /sbin/nologin proxy
+
+# curl is needed for the Docker HEALTHCHECK below (python:3.13-slim does not
+# include it). Install + remove apt cache in a single layer to keep image small.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends curl \
+ && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Pin dependencies for reproducible builds.
+# aiohttp: async HTTP client + WebSocket support
+# PyYAML: parse Hermes config.yaml for /mcp-servers endpoint
+COPY proxies/requirements-proxy.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir -r /tmp/requirements.txt \
+ || pip install --no-cache-dir aiohttp==3.12.15 PyYAML==6.0.2
+
+# Copy the proxy source and default assets.
+COPY proxies/dashboard-proxy.template.py /app/proxy.py
+COPY assets/ /app/assets/
+
+# Defaults (override via env vars at runtime).
+ENV HERMES_HOST=host.docker.internal \
+    HERMES_PORT=9119 \
+    DASHBOARD_PORT=9999 \
+    DASHBOARD_USERNAME=agent \
+    DASHBOARD_PASSWORD="" \
+    ASSETS_DIR=/app/assets \
+    CONFIG_PATH=/opt/data/config.yaml
+
+# The proxy is read-only at runtime; drop root.
+USER proxy
+
+EXPOSE 9999
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
+    CMD curl -sf http://localhost:${DASHBOARD_PORT}/ || exit 1
+
+ENTRYPOINT ["python", "-u", "/app/proxy.py"]

@@ -35,13 +35,19 @@ services:
       - thalor-net
 
   dashboard-proxy:
-    image: python:3.13-slim
+    # Pre-built image published to GHCR:
+    #   ghcr.io/carlonox/thalor/proxy:latest
+    # To build locally instead, uncomment the build block below and comment out 'image'.
+    image: ghcr.io/carlonox/thalor/proxy:latest
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile.proxy
+    container_name: ${AGENT_NAME:-thalor-agent}-proxy
     restart: unless-stopped
     ports:
       - "${DASHBOARD_PORT:-9999}:9999"
     volumes:
       - ./data:/opt/data
-      - ./proxies:/opt/proxies
       - ./assets:/opt/assets
     environment:
       - HERMES_HOST=hermes
@@ -50,13 +56,12 @@ services:
       - DASHBOARD_USERNAME=${DASHBOARD_USERNAME}
       - DASHBOARD_PASSWORD=${DASHBOARD_PASSWORD}
       - ASSETS_DIR=/opt/assets
-    command: bash -c "pip install aiohttp pyyaml && python3 /opt/proxies/dashboard-proxy.template.py"
     healthcheck:
-      test: ["CMD", "bash", "-c", "curl -sf http://localhost:9999/"]
+      test: ["CMD", "curl", "-sf", "http://localhost:9999/"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 60s
+      start_period: 30s
     depends_on:
       hermes:
         condition: service_healthy

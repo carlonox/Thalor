@@ -6,6 +6,9 @@
 .git
 .gitignore
 
+# CI/CD (not needed inside the image)
+.github/
+
 # Documentation
 *.md
 !README.md

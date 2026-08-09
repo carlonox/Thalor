@@ -1,0 +1,116 @@
+name: Docker Publish
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+    paths:
+      - 'proxies/**'
+      - 'assets/**'
+      - 'Dockerfile.proxy'
+      - '.github/workflows/docker-publish.yml'
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/proxy
+
+jobs:
+  build-and-push:
+    name: Build and push proxy image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU (multi-arch)
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=tag
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix=
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile.proxy
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+
+  validate-template:
+    name: Validate template integrity
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install PyYAML
+        run: pip install pyyaml
+
+      - name: Validate all YAML configs
+        run: |
+          python -c "
+          import yaml, glob, sys
+          errors = []
+          for f in glob.glob('**/*.yaml', recursive=True) + glob.glob('**/*.yml', recursive=True):
+              if '.env' in f or '.github' in f: continue
+              try:
+                  with open(f) as fh:
+                      yaml.safe_load(fh)
+              except Exception as e:
+                  errors.append(f'{f}: {e}')
+          if errors:
+              print('YAML validation errors:')
+              for e in errors: print(f'  - {e}')
+              sys.exit(1)
+          print('OK all YAML files valid')
+          "
+
+      - name: Validate Python syntax
+        run: |
+          python -m py_compile proxies/dashboard-proxy.template.py
+          python -m py_compile skills/consult-expert/ask_expert.py
+          python -m py_compile skills/system-snapshot/system_snapshot.py
+          echo "OK all Python files compile"
+
+      - name: Scan for leaked secrets
+        run: |
+          if grep -riE "am_us_|scrypt\\\$|Bearer eyJ|AIza[0-9A-Za-z_-]{35}|ghp_[A-Za-z0-9]{36}" . \
+              --exclude-dir=.git --exclude-dir=.github --exclude-dir=node_modules; then
+            echo "x potential secrets found in repository"
+            exit 1
+          fi
+          echo "OK no secrets detected"

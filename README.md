@@ -5,6 +5,8 @@ Production-grade starter kit for multi-agent AI systems built on [Hermes Agent](
 [![Docker](https://img.shields.io/badge/docker-required-blue)](https://www.docker.com/)
 [![Hermes](https://img.shields.io/badge/hermes-v0.20.0-orange)](https://github.com/NousResearch/hermes-agent)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI](https://github.com/carlonox/Thalor/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/carlonox/Thalor/actions/workflows/docker-publish.yml)
+[![GHCR](https://ghcr-badge.egpl.dev/carlonox/thalor/proxy/latest_tag?trim=major&label=ghcr&color=blue)](https://github.com/carlonox/Thalor/pkgs/container/thalor%2Fproxy)
 
 > **Note:** This is a template, not a framework. You bring your own SOUL.md, credentials, and use case. We bring the architecture.
 
@@ -35,6 +37,30 @@ First run takes ~5 minutes:
 - Docker pulls images (~2 min)
 - Mnemosyne installation (~2 min)
 - Plugin linking and container restart (~1 min)
+
+## Docker Image
+
+The dashboard proxy is published as a pre-built Docker image on GitHub Container Registry.
+The `docker-compose.yml` pulls it automatically on `docker compose up -d`.
+
+```bash
+# Pull directly
+docker pull ghcr.io/carlonox/thalor/proxy:latest
+
+# Run standalone (without the full stack)
+docker run -d \
+  -e HERMES_HOST=host.docker.internal \
+  -e HERMES_PORT=9119 \
+  -e DASHBOARD_USERNAME=agent \
+  -e DASHBOARD_PASSWORD=your-secret \
+  -p 9999:9999 \
+  ghcr.io/carlonox/thalor/proxy:latest
+```
+
+The image is rebuilt automatically on every push to `main` that touches `proxies/`,
+`assets/`, or `Dockerfile.proxy`. It is multi-arch (`linux/amd64` + `linux/arm64`),
+runs as a non-root user, and pins its dependencies. To build locally instead,
+uncomment the `build:` block in `docker-compose.yml` and comment out the `image:` line.
 
 ## What's Included
 
