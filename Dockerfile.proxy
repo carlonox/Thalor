@@ -34,7 +34,9 @@ LABEL org.opencontainers.image.licenses="MIT"
 LABEL org.opencontainers.image.authors="Carlos Javier Cuervo Baracaldo"
 
 # Security: non-root user
-RUN groupadd -r proxy && useradd -r -g proxy -d /app -s /sbin/nologin proxy
+# Note: 'proxy' group already exists in Debian Bookworm (python:3.13-slim base),
+# so we use 'appuser' to avoid 'group already exists' conflicts.
+RUN groupadd -r appuser && useradd -r -g appuser -d /app -s /sbin/nologin appuser
 
 # curl is needed for the Docker HEALTHCHECK below (python:3.13-slim does not
 # include it). Install + remove apt cache in a single layer to keep image small.
@@ -65,7 +67,7 @@ ENV HERMES_HOST=host.docker.internal \
     CONFIG_PATH=/opt/data/config.yaml
 
 # The proxy is read-only at runtime; drop root.
-USER proxy
+USER appuser
 
 EXPOSE 9999
 

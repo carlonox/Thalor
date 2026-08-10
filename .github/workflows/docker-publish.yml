@@ -108,8 +108,14 @@ jobs:
 
       - name: Scan for leaked secrets
         run: |
-          if grep -riE "am_us_|scrypt\\\$|Bearer eyJ|AIza[0-9A-Za-z_-]{35}|ghp_[A-Za-z0-9]{36}" . \
-              --exclude-dir=.git --exclude-dir=.github --exclude-dir=node_modules; then
+          # Scan code/config files for real leaked credentials.
+          # Intentionally EXCLUDED from scan:
+          #   - docs/               : contains educational examples like "$scrypt$..."
+          #   - *.example.yaml      : contain placeholder patterns like "am_us_[REDACTED]"
+          #   - .github/            : workflow files (no secrets)
+          if grep -riE "am_us_[a-f0-9]{16,}|scrypt\\\$[a-zA-Z0-9\\\$+/=]{20,}|Bearer eyJ[A-Za-z0-9_-]{20,}|AIza[0-9A-Za-z_-]{35}|ghp_[A-Za-z0-9]{36}" . \
+              --exclude-dir=.git --exclude-dir=.github --exclude-dir=node_modules --exclude-dir=docs \
+              --exclude="*.example.yaml"; then
             echo "x potential secrets found in repository"
             exit 1
           fi
