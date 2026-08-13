@@ -74,6 +74,8 @@ Things Hermes doesn't ship with out of the box:
 | **Dashboard** | WebSocket relay proxy with custom branding and mood avatars |
 | **Supervision** | s6-overlay patterns for production deployments |
 | **Hardening** | Production patterns (Delivery Obligation Ledger from Hermes v0.19+ auto-redelivery, s6 supervision, auto-backup) |
+| **Security** | Bitwarden Secrets Manager vault, Gitleaks pre-commit + CI, red-team agent (VIGÍA), Conventional Commits convention |
+| **Cloud** | Multi-VM deployment (Oracle ARM Always Free), Tailscale-only exposure, sister-bridge (agent↔agent HTTP), dot-agent (remote machine access) |
 
 ## When to Use This
 
@@ -129,6 +131,15 @@ Full diagram: [ARCHITECTURE.md](./ARCHITECTURE.md)
 - **[Robot Assistant](./examples/robot-assistant/)** — Conceptual: AWS DeepRacer with live calibration and voice control (architecture pattern, no physical hardware included)
 - **[Coding Assistant](./examples/coding-assistant/)** — Pair programmer with git workflows and code review
 - **[Business Assistant](./examples/business-assistant/)** — Email triage, meeting scheduling, report generation
+
+## Security & Cloud Patterns
+
+- **Secrets**: all credentials in Bitwarden Secrets Manager — never in repo files. Single bootstrap token in `.env`.
+- **Scanning**: Gitleaks pre-commit hook + CI workflow; optional red-team agent (VIGÍA) for weekly audits.
+- **Commits**: Conventional Commits 1.0.0 enforced across all agents (skill `conventional-commits-valentinaos`).
+- **Cloud**: add a 24/7 VM (Oracle ARM Always Free verified); expose services ONLY via Tailscale (no public ports).
+- **Agent-to-agent**: sister-bridge HTTP pattern for cross-host Hermes agents.
+- **Remote machines**: dot-agent portable Python client for machines where Tailscale can't be installed.
 
 ## Documentation
 

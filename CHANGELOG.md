@@ -7,6 +7,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ## [Unreleased]
 
 ### Added
+- **Security Hardening** section in ARCHITECTURE.md: Bitwarden Secrets Manager pattern (bootstrap token, never credentials in repos), Gitleaks pre-commit + CI scanning, red-team agent pattern (VIGÍA), Conventional Commits 1.0.0 convention.
+- **Multi-VM / Cloud Deployment** section: Oracle ARM Always Free 24/7 pattern, Tailscale-only exposure (no public ports, `tailscale serve`), sister-bridge agent↔agent HTTP pattern, dot-agent portable remote-machine client.
+- **Hardened backup pattern**: flat directory backups (not tarballs), secret verification before commit, placeholders in configs, history purge on contamination.
 - Pre-built Docker image for the dashboard proxy published to GitHub Container Registry:
   `ghcr.io/carlonox/thalor/proxy:latest` (auto-built on every push to `main` via
   GitHub Actions).
