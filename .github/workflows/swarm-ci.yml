@@ -1,0 +1,40 @@
+name: swarm-ci
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: gitleaks/gitleaks-action@v2
+        env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+
+  conventions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - run: python scripts/swarm_conventions.py --base "origin/main" --head "${{ github.sha }}"
+
+  docs-health:
+    # TODO(J-5): Thalor aún no tiene check de dominio propio con contrato
+    # exit 0/1 + JSON. Placeholder explícito hasta implementarlo.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: 'echo TODO-J5 pendiente check de dominio Thalor && exit 0'
+
+  path-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - run: python scripts/swarm_path_guard.py --base "origin/main" --head "${{ github.sha }}" --actor "${{ github.actor }}" --event "${{ github.event_name }}"

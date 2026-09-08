@@ -1,0 +1,5 @@
+# Approval obligatorio de Carlos en TODO el repo (require review from Code Owners)
+# Esqueleto Fase 0: solo el maintainer aprueba; los bots informan y mergean post-approval.
+*                                  @carlonox
+/docs/                              @carlonox
+/chronicle/                        @carlonox

@@ -1,0 +1,56 @@
+{
+  "version": "1.0.0",
+  "_origen": "Esqueleto Fase 0 del enjambre de agentes guardianes (2026-09-08). TODO: check de dominio propio con contrato exit 0/1 + JSON.",
+  "agents": {
+    "ops-watch": {
+      "github": "ops-watch-bot",
+      "write": "none",
+      "label_prefix": "ops-watch",
+      "dispatch_globs": ["*.py", "*.yml", "pyproject.toml", "requirements*.txt"]
+    },
+    "docs-sentinel": {
+      "github": "docs-sentinel-bot",
+      "write": "branch",
+      "branch_prefix": "sentinel/",
+      "label_prefix": "docs",
+      "allowed_globs": ["docs/**"],
+      "dispatch_globs": ["docs/**"]
+    },
+    "chronicler": {
+      "github": "chronicler-bot",
+      "write": "branch-auto",
+      "branch_prefix": "chronicle/",
+      "label_prefix": "chronicle",
+      "allowed_globs": ["chronicle/**"],
+      "dispatch_globs": []
+    },
+    "inventory-keeper": {
+      "github": "inventory-keeper-bot",
+      "write": "none",
+      "label_prefix": "org",
+      "dispatch_globs": ["skills/**", "scripts/**", "mcp-servers/**"]
+    },
+    "secret-hunter": {
+      "github": "secret-hunter-bot",
+      "write": "none",
+      "label_prefix": "security",
+      "dispatch_globs": [".env*", "*secret*", "docker-compose*.yml", "compose/**"]
+    },
+    "mem-gardener": {
+      "github": "mem-gardener-bot",
+      "write": "none",
+      "label_prefix": "memory-hygiene",
+      "dispatch_globs": []
+    }
+  },
+  "global": {
+    "deny": ["shared/**"],
+    "allow": [],
+    "note": "Thalor: shared/ es runtime ignorado (.gitignore:8), nada versionado debajo todavía"
+  },
+  "dispatch": {
+    "max_agents_per_commit": 2,
+    "priority": ["secret-hunter", "ops-watch", "docs-sentinel", "inventory-keeper"],
+    "fallback_agent": "ops-watch"
+  }
+}
