@@ -3,7 +3,7 @@
 Production-grade starter kit for multi-agent AI systems built on [Hermes Agent](https://github.com/NousResearch/hermes-agent).
 
 [![Docker](https://img.shields.io/badge/docker-required-blue)](https://www.docker.com/)
-[![Hermes](https://img.shields.io/badge/hermes-v0.20.0-orange)](https://github.com/NousResearch/hermes-agent)
+[![Hermes](https://img.shields.io/badge/hermes-v0.21.1-orange)](https://github.com/NousResearch/hermes-agent)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![CI](https://github.com/carlonox/Thalor/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/carlonox/Thalor/actions/workflows/docker-publish.yml)
 [![GHCR](https://ghcr-badge.egpl.dev/carlonox/thalor/proxy/latest_tag?trim=major&label=ghcr&color=blue)](https://github.com/carlonox/Thalor/pkgs/container/thalor%2Fproxy)
@@ -58,7 +58,7 @@ docker run -d \
 ```
 
 The image is rebuilt automatically on every push to `main` that touches `proxies/`,
-`assets/`, or `Dockerfile.proxy`. It is multi-arch (`linux/amd64` + `linux/arm64`),
+`assets/`, or `Dockerfile.proxy` (plus a monthly scheduled refresh for base-image security patches; manual runs via `workflow_dispatch`). It is multi-arch (`linux/amd64` + `linux/arm64`),
 runs as a non-root user, and pins its dependencies. To build locally instead,
 uncomment the `build:` block in `docker-compose.yml` and comment out the `image:` line.
 
@@ -128,6 +128,7 @@ Full diagram: [ARCHITECTURE.md](./ARCHITECTURE.md)
 
 ## Example Implementations
 
+- **[Specialist Role Souls](./templates/soul-examples/)** — Five ready-to-adapt personas for swarm-style setups: sysadmin, data scientist, research, **docs sentinel** and **memory gardener**, with coordination patterns in [Multi-Agent Patterns](./docs/multi-agent-patterns.md)
 - **[Robot Assistant](./examples/robot-assistant/)** — Conceptual: AWS DeepRacer with live calibration and voice control (architecture pattern, no physical hardware included)
 - **[Coding Assistant](./examples/coding-assistant/)** — Pair programmer with git workflows and code review
 - **[Business Assistant](./examples/business-assistant/)** — Email triage, meeting scheduling, report generation
