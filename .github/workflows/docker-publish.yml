@@ -11,6 +11,11 @@ on:
       - '.github/workflows/docker-publish.yml'
   workflow_dispatch:
 
+  schedule:
+    # Monthly refresh: rebuild with the latest base-image security patches
+    # even when proxy sources don't change.
+    - cron: '17 4 1 * *'
+
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}/proxy
