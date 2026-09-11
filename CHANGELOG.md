@@ -7,6 +7,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ## [Unreleased]
 
 ### Added
+- Two new soul examples — domain-specialist roles for a swarm:
+  `quill-docs-sentinel` (documentation consistency) and `moss-memory-gardener` (memory hygiene).
+- **Swarm Roles** section in `docs/multi-agent-patterns.md`: hard lanes, specialist profiles,
+  coordination via peer messaging / work queues / event hooks / change-gated cron sentinels.
+- Consult Expert skill: panel-seat selection guidance + shared-pool troubleshooting
+  (flaky seats, retries, live router key lookup, per-seat observability).
 - **Security Hardening** section in ARCHITECTURE.md: Bitwarden Secrets Manager pattern (bootstrap token, never credentials in repos), Gitleaks pre-commit + CI scanning, red-team agent pattern (VIGÍA), Conventional Commits 1.0.0 convention.
 - **Multi-VM / Cloud Deployment** section: Oracle ARM Always Free 24/7 pattern, Tailscale-only exposure (no public ports, `tailscale serve`), sister-bridge agent↔agent HTTP pattern, dot-agent portable remote-machine client.
 - **Hardened backup pattern**: flat directory backups (not tarballs), secret verification before commit, placeholders in configs, history purge on contamination.

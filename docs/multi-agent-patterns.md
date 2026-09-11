@@ -540,3 +540,27 @@ mnemosyne_remember(content="corrected fact", importance=0.9)
 - [Memory (BEAM)](./memory-beam.md)
 - [Production Deploy](./production-deploy.md)
 - [Hermes Multi-Profile Docs](https://github.com/NousResearch/hermes-agent/blob/main/docs/profiles.md)
+
+---
+
+## Swarm Roles — Domain Specialists
+
+Instead of one all-purpose agent, grow a **swarm**: one specialist profile per domain
+(documentation, memory hygiene, code review, security, inventory…). Each specialist:
+
+- **Owns a hard lane** — a narrow set of paths it may *write*. The lane itself is the security boundary.
+- **Has its own SOUL, config, and skills** — specialized context beats a bloated generalist.
+- **Verifies against reality** — numbers come from commands/DBs, never from memory.
+- **Reports, never closes** — humans (or a designated orchestrator agent) review and merge.
+  No specialist makes final decisions outside its lane.
+
+Coordination options (pick per scale, combine at will):
+
+- **Peer messaging** (bot-to-bot) for direct specialist↔specialist handoffs.
+- **A work queue / kanban board** when multiple specialists consume and produce tasks.
+- **Event hooks** (e.g., post-commit) so specialists run only when their domain changed.
+- **Change-gated scheduled sentinels** (cron jobs that skip the LLM entirely when nothing
+  changed) for continuous monitoring at ~zero cost while idle.
+
+Ready-to-adapt role SOULs live in `templates/soul-examples/`: `quill-docs-sentinel.md`
+(documentation consistency) and `moss-memory-gardener.md` (memory hygiene).

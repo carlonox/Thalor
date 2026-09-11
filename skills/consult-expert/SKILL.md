@@ -75,3 +75,18 @@ python3 /opt/data/skills/consult-expert/ask_expert.py \
    work because the error occurs in nested access data['event']['timestamp']. \
    What is the root cause and solution?"
 ```
+
+## PANEL SEATS & TROUBLESHOOTING (production notes)
+
+**Choosing panel seats:** prefer seats validated by small benchmarks (2-3 realistic cases) over catalog promises. A healthy default panel mixes: one reliable fast generalist, one strong reasoning model, one diverse-vendor voice, and one high-capacity reserve — plus a strong judge. Keep `k >= 3` so one flaky seat never breaks a consult.
+
+**Shared free pools are flaky by nature** (429s, silent stalls, multi-minute retries). Mitigations: per-seat timeouts, automatic retries, tolerance for partial answers, and never a single point of failure in the panel.
+
+**Troubleshooting `Invalid API key` from the router:** the live client key lives in the router's own DB (`settings` table, `unified_api_key`), not in stale local copies. Read it from there (adapt paths to your setup):
+
+```bash
+docker cp <router-container>:/app/server/data/<db> /tmp/db \
+  && sqlite3 /tmp/db "SELECT value FROM settings WHERE key='unified_api_key'"
+```
+
+**Per-seat observability:** per-request logs (model, status, latency, tokens) tell you which seats actually work — rotate seats with evidence, not vibes.
