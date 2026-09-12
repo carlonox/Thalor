@@ -69,7 +69,7 @@ def ask(prompt: str) -> str:
     try:
         log.info("Consulting expert panel (Fusion)...")
         response = client.chat.completions.create(
-            model="fusion",  # The magic happens here
+            model="fusion",  # Fusion mode: parallel panel + judge synthesis
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": prompt}

@@ -35,18 +35,18 @@ docker compose up -d
 
 **Agent:** I see 20 unread emails. Here's the priority breakdown:
 
-**🔴 Urgent (3):**
+**Urgent (3):**
 1. Client X — Contract signature needed by EOD
 2. Server alert — Production database at 95% capacity
 3. Legal — Compliance deadline tomorrow
 
-**🟡 Important (7):**
+**Important (7):**
 4. Team meeting — Agenda for Friday
 5. Vendor invoice — Due next week
 6. Project update — Milestone 3 complete
 ...
 
-**🟢 Low priority (10):**
+**Low priority (10):**
 11. Newsletter — Industry trends
 12. Marketing — New blog post
 ...
@@ -69,7 +69,7 @@ Want me to draft responses for the urgent ones? `[mood: focused]`
 **Agent:** Found 4 available slots:
 
 - **Monday 2:00-3:00 PM**
-- **Tuesday 10:00-11:00 AM** ⭐ (recommended — early in week)
+- **Tuesday 10:00-11:00 AM** (recommended — early in week)
 - **Wednesday 3:00-4:00 PM**
 - **Thursday 9:00-10:00 AM**
 

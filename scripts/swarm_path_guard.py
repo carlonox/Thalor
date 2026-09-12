@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""swarm_path_guard.py — jaula de CI del enjambre (stdlib only).
+"""swarm_path_guard.py — swarm CI cage (stdlib only).
 
-Lee config/swarm.routing.json; en pull_request calcula git diff --name-only
-base...head y verifica que el actor (github.actor) solo toque sus
-allowed_globs. En push a main: no-op exit 0 con log (D14: sin if: en el job).
+Reads config/swarm.routing.json; on pull_request computes git diff --name-only
+base...head and verifies that the actor (github.actor) only touches its
+allowed_globs. On push to main: no-op exit 0 with log (D14: no if: in the job).
 
-Regla global P-13: shared/** denegado salvo shared/PENDIENTES.md y
-shared/docs_arquitectura/** — los allowed_globs de cada bot ya lo reflejan;
-aquí se chequea como defensa en profundidad.
+Global rule P-13: shared/** denied except shared/PENDIENTES.md and
+shared/docs_arquitectura/** — each bot's allowed_globs already reflects this;
+it is checked here as defense in depth.
 """
 import argparse
 import fnmatch
@@ -21,7 +21,7 @@ DEFAULT_CONFIG = REPO / "config" / "swarm.routing.json"
 
 
 def match_segments(pat_segs, path_segs):
-    """Matcher recursivo: '**' consume 0..N segmentos, '*' por segmento."""
+    """Recursive matcher: '**' consumes 0..N segments, '*' per segment."""
     if not pat_segs:
         return not path_segs
     if pat_segs[0] == "**":
@@ -51,7 +51,7 @@ def main():
     args = ap.parse_args()
 
     if args.event == "push":
-        print("path-guard: push event — no-op exit 0 (auditoria)")
+        print("path-guard: push event — no-op exit 0 (audit only)")
         return 0
 
     cfg = json.loads(Path(args.config).read_text(encoding="utf-8"))
@@ -60,7 +60,7 @@ def main():
         (a for a, c in agents.items() if c.get("github") == args.actor), None
     )
     if agent is None:
-        print(f"path-guard: actor humano '{args.actor}' — sin jaula, exit 0")
+        print(f"path-guard: human actor '{args.actor}' — no cage, exit 0")
         return 0
 
     allowed = agents[agent].get("allowed_globs", [])
@@ -70,7 +70,7 @@ def main():
     )
     files = [l.strip() for l in proc.stdout.splitlines() if l.strip()]
     if not files:
-        print(f"path-guard: sin archivos en el rango — {agent} OK")
+        print(f"path-guard: no files in range — {agent} OK")
         return 0
 
     glob_cfg = cfg.get("global", {})
@@ -87,12 +87,12 @@ def main():
             violations.append(f)
 
     if violations:
-        print(f"path-guard: INFRACCION — {args.actor} ({agent}) fuera de scope:")
+        print(f"path-guard: VIOLATION — {args.actor} ({agent}) out of scope:")
         for v in violations:
             print(f"  - {v}")
         print(f"  allowed: {allowed}")
         return 1
-    print(f"path-guard: OK — {args.actor} ({agent}), {len(files)} archivos en scope")
+    print(f"path-guard: OK — {args.actor} ({agent}), {len(files)} files in scope")
     return 0
 
 

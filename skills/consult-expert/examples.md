@@ -52,7 +52,7 @@
 ]}
 ```
 
-**Tool result:** `✅ 1,204 events parsed, 0 errors.`
+**Tool result:** `1,204 events parsed, 0 errors.`
 
 **Agent:** Solved — it was an inconsistent schema issue between batches, not the try/except. Saving the lesson to global memory:
 

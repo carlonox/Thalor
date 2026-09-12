@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""swarm_snapshot_compare.py — compara salud docs vs baseline (stdlib only).
+"""swarm_snapshot_compare.py — compares docs health vs baseline (stdlib only).
 
-Uso: python scripts/swarm_snapshot_compare.py health.json --max-regression 0
+Usage: python scripts/swarm_snapshot_compare.py health.json --max-regression 0
      [--baseline shared/docs_arquitectura/snapshot.json]
 
-Contrato [GENÉRICO]: exit 0 si regresión <= max, exit 1 si mayor.
-El script de dominio del proyecto (--json) emite el JSON;
-este compare solo mide deltas. Sin baseline versionado: todo pasa con aviso.
+Contract [GENERIC]: exit 0 if regression <= max, exit 1 if greater.
+The project's domain script (--json) emits the JSON;
+this compare only measures deltas. Without a versioned baseline: everything passes with a warning.
 """
 import argparse
 import json
@@ -28,7 +28,7 @@ def score(data):
                 total += int(v)
         if total:
             return total
-        # fallback: cuenta recursiva de dicts con level error/warning
+        # fallback: recursive count of dicts with level error/warning
         return 0
     if isinstance(data, list):
         return len(data)
@@ -37,7 +37,7 @@ def score(data):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("health", help="JSON actual de doc_health_check.py")
+    ap.add_argument("health", help="current JSON from doc_health_check.py")
     ap.add_argument("--max-regression", type=int, default=0)
     ap.add_argument("--baseline", default=str(DEFAULT_BASELINE))
     args = ap.parse_args()
@@ -46,14 +46,14 @@ def main():
     cur_score = score(cur)
     bpath = Path(args.baseline)
     if not bpath.exists():
-        print(f"snapshot_compare: sin baseline ({bpath}) — pasa con aviso "
-              f"(actual={cur_score})")
+        print(f"snapshot_compare: no baseline ({bpath}) — passes with warning "
+              f"(current={cur_score})")
         return 0
     base = json.loads(bpath.read_text(encoding="utf-8"))
     base_score = score(base)
     regression = max(0, cur_score - base_score)
-    print(f"snapshot_compare: base={base_score} actual={cur_score} "
-          f"regresión={regression} (máx={args.max_regression})")
+    print(f"snapshot_compare: base={base_score} current={cur_score} "
+          f"regression={regression} (max={args.max_regression})")
     return 0 if regression <= args.max_regression else 1
 
 

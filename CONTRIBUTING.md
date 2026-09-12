@@ -255,4 +255,4 @@ Contributors are recognized in:
 - Release notes
 - GitHub contributors page
 
-Thank you for contributing to Thalor! 🚀
+Thank you for contributing to Thalor!

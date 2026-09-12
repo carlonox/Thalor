@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "_origen": "Esqueleto Fase 0 del enjambre de agentes guardianes (2026-09-08). TODO: check de dominio propio con contrato exit 0/1 + JSON.",
+  "_origin": "Phase 0 skeleton of the guardian-agent swarm (2026-09-08). TODO: own-domain check with an exit 0/1 + JSON contract.",
   "agents": {
     "ops-watch": {
       "github": "ops-watch-bot",
@@ -46,7 +46,7 @@
   "global": {
     "deny": ["shared/**"],
     "allow": [],
-    "note": "Thalor: shared/ es runtime ignorado (.gitignore:8), nada versionado debajo todavía"
+    "note": "Thalor: shared/ is ignored runtime (.gitignore:8), nothing versioned under it yet"
   },
   "dispatch": {
     "max_agents_per_commit": 2,

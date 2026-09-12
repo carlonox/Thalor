@@ -462,10 +462,10 @@ Each agent should have:
 ### 2. Minimal Sharing
 
 Share only what's necessary:
-- ✅ Kanban boards (coordination)
-- ✅ Documentation (knowledge)
-- ❌ Session history (privacy)
-- ❌ Working memory (isolation)
+- Kanban boards (coordination)
+- Documentation (knowledge)
+- Session history (privacy)
+- Working memory (isolation)
 
 ### 3. Explicit Communication
 

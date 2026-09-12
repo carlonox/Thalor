@@ -2,7 +2,7 @@
 
 A **conceptual example** showing how Thalor's architecture applies to a physical robot (AWS DeepRacer).
 
-> ⚠️ **Note:** This is an architectural pattern, not a turnkey deployment. It demonstrates
+> **Note:** This is an architectural pattern, not a turnkey deployment. It demonstrates
 > how to integrate hardware, voice control, and live calibration with Thalor. You'll need
 > your own robot hardware and firmware to run this.
 

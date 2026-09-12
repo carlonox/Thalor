@@ -18,7 +18,7 @@ services:
       - HERMES_HOME=/opt/data
       - HOME=/opt/data
       - HERMES_WRITE_SAFE_ROOT=/opt/data
-    # Nota: la imagen registra gateways dinámicamente vía gateway_state.json — no overridear CMD
+    # Note: the image registers gateways dynamically via gateway_state.json — do not override CMD
     healthcheck:
       test:
         [

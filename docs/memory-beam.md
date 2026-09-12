@@ -206,7 +206,7 @@ stats = mnemosyne_stats()
 
 ### What to Save
 
-✅ **Save:**
+**Save:**
 - Confirmed user preferences
 - Technical configurations
 - IP addresses and hostnames
@@ -214,7 +214,7 @@ stats = mnemosyne_stats()
 - Successful approaches
 - Important dates and deadlines
 
-❌ **Don't save:**
+**Don't save:**
 - Temporary debugging output
 - Session-specific conversations
 - Raw logs or stack traces

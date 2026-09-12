@@ -25,12 +25,12 @@ jobs:
       - run: python scripts/swarm_conventions.py --base "origin/main" --head "${{ github.sha }}"
 
   docs-health:
-    # TODO(J-5): Thalor aún no tiene check de dominio propio con contrato
-    # exit 0/1 + JSON. Placeholder explícito hasta implementarlo.
+    # TODO(J-5): Thalor does not have its own domain check with an
+    # exit 0/1 + JSON contract yet. Explicit placeholder until implemented.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: 'echo TODO-J5 pendiente check de dominio Thalor && exit 0'
+      - run: 'echo TODO-J5 Thalor domain check pending && exit 0'
 
   path-guard:
     runs-on: ubuntu-latest

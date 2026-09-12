@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""swarm_conventions.py — convenciones del enjambre (stdlib only).
+"""swarm_conventions.py — swarm conventions (stdlib only).
 
-Chequea sobre el rango base...head:
-- Conventional Commits 1.0.0 en cada mensaje (type válido, minúsculas, scope
-  opcional en minúsculas, descripción imperativa no vacía, sin punto final,
-  asunto <= 72 en la primera línea).
-- snake_case en *.py nuevos/modificados.
-- kebab-case + patrón NN-nombre.md en shared/docs_arquitectura/**.md.
-- Cero archivos nuevos que matcheen *.bak*.
+Checks over the base...head range:
+- Conventional Commits 1.0.0 on every message (valid type, lowercase, optional
+  lowercase scope, non-empty imperative description, no trailing period,
+  subject <= 72 on the first line).
+- snake_case in new/modified *.py files.
+- kebab-case + NN-name.md pattern in shared/docs_arquitectura/**.md.
+- No new files matching *.bak*.
 """
 import argparse
 import re
@@ -44,14 +44,14 @@ def main():
     for s in subjects:
         m = SUBJECT_RE.match(s)
         if not m or m.group("type") not in TYPES:
-            errors.append(f"commit fuera de convención: {s!r}")
+            errors.append(f"commit outside convention: {s!r}")
             continue
         first = s.split(":")[0]
         if len(s) > 72:
-            errors.append(f"asunto >72 chars: {s!r}")
+            errors.append(f"subject >72 chars: {s!r}")
         desc = m.group("desc").strip()
         if not desc or desc.endswith("."):
-            errors.append(f"descripción vacía o con punto final: {s!r}")
+            errors.append(f"empty description or trailing period: {s!r}")
         _ = first
 
     files = [l.strip() for l in
@@ -60,20 +60,20 @@ def main():
     for f in files:
         base = f.rsplit("/", 1)[-1]
         if fnmatch_bak(base):
-            errors.append(f"archivo .bak prohibido: {f}")
+            errors.append(f".bak file forbidden: {f}")
             continue
         if f.endswith(".py") and not PY_RE.match(base):
-            errors.append(f"py no snake_case: {f}")
+            errors.append(f"py not snake_case: {f}")
         if f.startswith("shared/docs_arquitectura/") and f.endswith(".md"):
             if not DOC_RE.match(base):
-                errors.append(f"doc fuera de patrón NN-kebab: {f}")
+                errors.append(f"doc outside NN-kebab pattern: {f}")
 
     if errors:
-        print("conventions: FALLO")
+        print("conventions: FAIL")
         for e in errors:
             print(f"  - {e}")
         return 1
-    print(f"conventions: OK ({len(subjects)} commits, {len(files)} archivos)")
+    print(f"conventions: OK ({len(subjects)} commits, {len(files)} files)")
     return 0
 
 

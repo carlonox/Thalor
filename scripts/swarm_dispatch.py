@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""swarm_dispatch.py — dispatcher post-commit del enjambre (stdlib only).
+"""swarm_dispatch.py — swarm post-commit dispatcher (stdlib only).
 
-Modelo: el hook escribe SIEMPRE en shared/ops_queue/ (persistencia primero);
-el wake al container es best-effort. Cada perfil drena su cola al arrancar.
-Locks atómicos O_EXCL en shared/ops_locks/ con TTL anti-huérfanos.
+Model: the hook ALWAYS writes to shared/ops_queue/ (persistence first);
+the container wake is best-effort. Each profile drains its queue on startup.
+Atomic O_EXCL locks in shared/ops_locks/ with orphan-safe TTL.
 
-Uso: python scripts/swarm_dispatch.py HEAD~1..HEAD [--dry-run]
+Usage: python scripts/swarm_dispatch.py HEAD~1..HEAD [--dry-run]
 """
 import fnmatch
 import hashlib
@@ -79,7 +79,7 @@ def run(agent, job):
             stderr=subprocess.STDOUT, start_new_session=True)
         return True
     except Exception as e:  # noqa: BLE001 — wake best-effort
-        log(f"wake {agent} falló (queda encolado): {e}")
+        log(f"wake {agent} failed (stays queued): {e}")
         try:
             os.remove(os.path.join(LOCKS, agent + ".lock"))
         except OSError:
@@ -89,7 +89,7 @@ def run(agent, job):
 
 def main():
     if len(sys.argv) < 2:
-        print("uso: swarm_dispatch.py <rango> [--dry-run]")
+        print("usage: swarm_dispatch.py <range> [--dry-run]")
         return 2
     rng, dry = sys.argv[1], "--dry-run" in sys.argv
     os.makedirs(QUEUE, exist_ok=True)
@@ -103,14 +103,14 @@ def main():
             for a, c in agents.items() if c.get("dispatch_globs")}
     eligible = [a for a, ps in hits.items() if ps]
     if len(eligible) >= 3:
-        log(f"commit multi-dominio ({len(eligible)}) -> solo ops-watch")
+        log(f"multi-domain commit ({len(eligible)}) -> ops-watch only")
         eligible = ["ops-watch"] if "ops-watch" in hits else []
     else:
         prio = cfg.get("dispatch", {}).get("priority", eligible)
         mx = cfg.get("dispatch", {}).get("max_agents_per_commit", 2)
         eligible = [a for a in prio if a in eligible][:mx]
     if not eligible:
-        log(f"dispatch {rng}: sin agentes ({len(files)} archivos)")
+        log(f"dispatch {rng}: no agents ({len(files)} files)")
         return 0
     for a in eligible:
         job = {"files": hits.get(a, []), "range": rng, "ts": time.time(),
@@ -121,7 +121,7 @@ def main():
         if not dry:
             with open(path, "w", encoding="utf-8") as f:
                 json.dump(job, f)
-        log(f"dispatch {rng}: {a} <- {len(hits.get(a, []))} archivos"
+        log(f"dispatch {rng}: {a} <- {len(hits.get(a, []))} files"
             f"{' (dry-run)' if dry else ''}")
         if not dry:
             run(a, job)

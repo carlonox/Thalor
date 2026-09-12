@@ -18,7 +18,7 @@ services:
       - HERMES_WRITE_SAFE_ROOT=/opt/data
       - HERMES_DISABLE_LAZY_INSTALLS=1
       - HERMES_LAZY_INSTALL_TARGET=/opt/data/lazy-packages
-    # Nota: la imagen registra gateways dinámicamente vía gateway_state.json — no overridear CMD
+    # Note: the image registers gateways dynamically via gateway_state.json — do not override CMD
     healthcheck:
       test:
         [
