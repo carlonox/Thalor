@@ -9,6 +9,8 @@ Production-grade starter kit for multi-agent AI systems built on [Hermes Agent](
 [![GHCR](https://ghcr-badge.egpl.dev/carlonox/thalor/proxy/latest_tag?trim=major&label=ghcr&color=blue)](https://github.com/carlonox/Thalor/pkgs/container/thalor%2Fproxy)
 
 > **Note:** This is a template, not a framework. You bring your own SOUL.md, credentials, and use case. We bring the architecture.
+>
+> **Updated:** September 2026 — validated against Hermes Agent **v0.21.1**; includes guardian-swarm patterns (docs sentinel, memory gardener, ops-watch) and multi-gateway routing examples.
 
 Named after the **thalamus** — the brain structure that connects and coordinates neural regions. Just as the thalamus orchestrates neural activity, Thalor orchestrates AI agents.
 
