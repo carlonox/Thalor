@@ -1,6 +1,20 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "_origin": "Phase 0 skeleton of the guardian-agent swarm (2026-09-08). TODO: own-domain check with an exit 0/1 + JSON contract.",
+  "_note": "v1.1: adds the deployment block with both modalities (see docs/deployment-modalities.md).",
+  "deployment": {
+    "mode": "local",
+    "queue_dir": ".swarm/queue",
+    "local": {
+      "wake": "hook post-commit -> scripts/swarm_dispatch.py <range>",
+      "note": "each profile drains its queue on startup"
+    },
+    "cloud": {
+      "wake": "GitHub webhook -> scripts/swarm_webhook.py on the VM",
+      "webhook_secret_name": "SWARM_WEBHOOK_SECRET",
+      "note": "the value lives in the VM's secrets manager, never in the repo. The brain is an LLM API (keys in the secrets manager); no local models on the VM."
+    }
+  },
   "agents": {
     "ops-watch": {
       "github": "ops-watch-bot",

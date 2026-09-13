@@ -16,6 +16,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - **Security Hardening** section in ARCHITECTURE.md: Bitwarden Secrets Manager pattern (bootstrap token, never credentials in repos), Gitleaks pre-commit + CI scanning, red-team agent pattern (VIGÍA), Conventional Commits 1.0.0 convention.
 - **Multi-VM / Cloud Deployment** section: Oracle ARM Always Free 24/7 pattern, Tailscale-only exposure (no public ports, `tailscale serve`), sister-bridge agent↔agent HTTP pattern, dot-agent portable remote-machine client.
 - **Hardened backup pattern**: flat directory backups (not tarballs), secret verification before commit, placeholders in configs, history purge on contamination.
+- **Deployment modalities template** (`docs/deployment-modalities.md`): local profiles vs cloud 24/7,
+  plus `config/swarm.routing.json` v1.1 with the `deployment` block (`mode`, `queue_dir`, `webhook_secret_name`).
+- `scripts/swarm_webhook.py` — HMAC-verified GitHub webhook receiver for the cloud modality
+  (enqueue + immediate 200; per-agent dispatch is a documented TODO).
 - Pre-built Docker image for the dashboard proxy published to GitHub Container Registry:
   `ghcr.io/carlonox/thalor/proxy:latest` (auto-built on every push to `main` via
   GitHub Actions).
