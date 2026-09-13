@@ -45,9 +45,11 @@ Things the agent must NEVER do:
 
 ### Must use:
 - [List of preferred tools]
+- File searches: the `search_files` tool (ripgrep) or `rg` in the terminal — never recursive `grep -r` on large trees (it hangs)
 
 ### Must avoid:
 - [List of obsolete or dangerous tools]
+- `grep -r` over large data trees (use `rg`/`search_files`; if a search returns empty on data trees, retry with `-uu`/`-uuu` before reporting "not found")
 
 ## Memory (Mnemosyne)
 

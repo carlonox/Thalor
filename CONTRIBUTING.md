@@ -120,6 +120,15 @@ def calculate_metric(value: float, weight: float = 1.0) -> float:
 - Use fenced code blocks with language
 - One sentence per line (for better diffs)
 
+### Shell tooling — ripgrep first
+
+When searching file trees, prefer `ripgrep` (`rg`) over `grep`:
+
+- `rg` is faster, respects `.gitignore` by default, and ships in the standard stack image.
+- NEVER use recursive `grep -r` on large data trees — it can hang for minutes and block the whole turn. Use `rg` or the agent's `search_files` tool instead.
+- Empty results on data trees are not conclusive: retry with `rg -uu` (includes ignored and hidden files) before reporting "not found".
+- Gotchas: `rg` does not follow symlinks by default (`-L` enables it), silently skips files containing NUL bytes (`-a` forces them), and `rg -q pattern` without a path scans the current directory — unlike `grep -q`, which reads stdin.
+
 ## Documentation
 
 ### Updating Documentation
